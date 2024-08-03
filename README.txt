@@ -21,34 +21,49 @@ sudo chmod +x install-openvpn.sh
 4- Ingresamos una contraseña para el certificado (CA) que nos servira 
 para firmar el servidor y cliente también establecemos un nombre
 
-[Easy-RSA CA]: OpenVPN-CA  <-- Por ejemplo use este nombre
+Enter New CA Key Passphrase:      your_password
+Re-Enter New CA Key Passphrase:   your_password
+
+Enter PEM pass phrase:              your_password
+Verifying - Enter PEM pass phrase:  your_password
+
+
+Common Name (eg: your user, host, or server name) [Easy-RSA CA]: OpenVPN-CA  <-- Por ejemplo use este nombre
 
 5- Ingrese un nombre para el servidor: servidor-vpn <-- Por ejemplo use este nombre
 
 6- Cuando apresca este mensaje y tenga el nombre que le difinimos 
 
-[seridor-vpn]: "Presionar Enter"
+Common Name (eg: your user, host, or server name) [servidor-vpn]:"Presionar Enter"
 
 7- Luego pedira una confirmacion escribimos "yes"
 
+Confirm request details: yes
+
 8- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 4
 
-9- Una ves finalizado ingresar al script 
+Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key: your_password
+
+9- Una ves finalizado la instalación ingresar al script 
 
 nano install-openvpn.sh
 
-Podemos modificar el puerto si deseamos en la linea 96, 247 , 356 en 
+Podemos modificar el puerto si deseamos en las siguientes lineas 96, 247 y 356 en 
 
 # CONFIGURACION DEL SERVIDOR
 
 # Puerto
-port 1194
+port 1194 <--- modificamos o dejamos por defecto, linea 96
 
 # CONFIGURACION DEL CLIENTE
 
-remote 123.456.789.10 1194 # en la linea 247 ponemos la ip Publica y el puerto
+remote 123.456.789.10 1194 <---- Ponemos la ip Publica del servidor y el puerto, linea 247
 
 # CONFIGURACION DE FIREALL E IPTABLES
+
+ufw allow 1194/udp <--- modificamos o dejamos por defecto, linea 356
+
+Aca cambiamos el nombre del adaptador de red "eth0" por el nuestro
 
 10- En # CONFIGURACION DEL SERVIDOR linea 110 y 111
 
@@ -65,13 +80,49 @@ sudo chmod +x cliente-openvpn.sh
 
 ./cliente-openvpn.sh
 
-14 - Creamos el nombre del cliente , ponemos la contraseña del punto 4, confirmamos yes
-volvemos a escribir el nombre del cliente y se generara el archivo de configuracion en
+14 - Creamos el nombre del cliente 
 
-/home/OpenVPN-Clientes
+Ingrese un nombre para el cliente:
+cliente <-- Por ejemplo use este nombre
 
-cliente.ovpn <-- Este archivo nos servira para conectarnos al servidor.
+15- Cuando apresca este mensaje y tenga el nombre que le difinimos 
 
-15- Ejecutar este comando en la terminal 
+Common Name (eg: your user, host, or server name) [cliente]: "Presionar Enter"
 
-sudo openvpen cliente.ovpn
+16- Luego pedira una confirmacion escribimos "yes"
+
+Confirm request details: yes
+
+17- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 4
+
+Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key: your_password
+
+18- Volvemos a escribir el nombre del cliente 
+
+Se han copiados los certificados y claves
+
+Ingrese el mismo nombre que creo para cliente:
+cliente
+
+19- Vaya al directorio /home/OpenVPN-Clientes
+
+cliente.ovpn <-- Este archivo nos servira para conectarnos al servidor VPN
+
+20- Si estamos en linux  ejecutamos los siguientes comandos
+
+sudo apt install openvpn
+sudo apt install openvpn-systemd-resolved
+
+Añadimos las siguientes lineas a este fichero al final del archivo 
+
+nano cliente.ovpn
+
+script-security 2
+up /etc/openvpn/update-systemd-resolved
+down /etc/openvpn/update-systemd-resolved
+down-pre
+dhcp-option DOMAIN-ROUTE .
+
+16 - Ejecutamos este comando en la terminal
+
+sudo openvpn cliente.ovpn
