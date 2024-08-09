@@ -6,19 +6,40 @@ Autor: DarioNel
 
 INSTALACIÓN DE OPENVPN
 
-1- Ingresar con permisos privilegiados como usuario Root
+1- Editar el script 
+
+nano install-openvpn.sh
+
+Podemos modificar el puerto si deseamos 
+
+# CONFIGURACION DEL SERVIDOR
+
+# Puerto
+port 1194 <--- modificamos o dejamos por defecto
+
+# CONFIGURACION DEL CLIENTE
+
+remote 123.456.789.10 1194 <---- Ponemos la ip Publica del servidor y el puerto
+
+# CONFIGURACION DE FIREWALL E IPTABLES
+
+Aca cambiamos el nombre del adaptador de red "eth0" por el nuestro
+
+salimos y guardamos los cambios.
+
+2- Ingresar con permisos privilegiados como usuario Root
 
 sudo su
 
-2- Dar permisos de ejecución
+3- Dar permisos de ejecución
 
-sudo chmod +x install-openvpn.sh
+chmod +x install-openvpn.sh
 
-3- Ejecutar el script install-openvpn.sh
+4- Ejecutar el script install-openvpn.sh
 
 ./install-openvpn.sh
 
-4- Ingresamos una contraseña para el certificado (CA) que nos servira 
+5- Ingresamos una contraseña para el certificado (CA) que nos servira 
 para firmar el servidor y cliente también establecemos un nombre
 
 Enter New CA Key Passphrase:      your_password
@@ -30,47 +51,28 @@ Verifying - Enter PEM pass phrase:  your_password
 
 Common Name (eg: your user, host, or server name) [Easy-RSA CA]: OpenVPN-CA  <-- Por ejemplo use este nombre
 
-5- Ingrese un nombre para el servidor: servidor-vpn <-- Por ejemplo use este nombre
+6- Ingrese un nombre para el servidor: servidor-vpn <-- Por ejemplo use este nombre
 
-6- Cuando apresca este mensaje y tenga el nombre que le difinimos 
+7- Cuando apresca este mensaje y tenga el nombre que le difinimos 
 
 Common Name (eg: your user, host, or server name) [servidor-vpn]:"Presionar Enter"
 
-7- Luego pedira una confirmacion escribimos "yes"
+8- Luego pedira una confirmacion escribimos "yes"
 
 Confirm request details: yes
 
-8- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 4
+9- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 5
 
 Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key: your_password
 
-9- Una ves finalizado la instalación ingresar al script 
-
-nano install-openvpn.sh
-
-Podemos modificar el puerto si deseamos en las siguientes lineas 96, 247 y 356 en 
-
-# CONFIGURACION DEL SERVIDOR
-
-# Puerto
-port 1194 <--- modificamos o dejamos por defecto, linea 96
-
-# CONFIGURACION DEL CLIENTE
-
-remote 123.456.789.10 1194 <---- Ponemos la ip Publica del servidor y el puerto, linea 247
-
-# CONFIGURACION DE FIREALL E IPTABLES
-
-ufw allow 1194/udp <--- modificamos o dejamos por defecto, linea 356
-
-Aca cambiamos el nombre del adaptador de red "eth0" por el nuestro
-
-10- En # CONFIGURACION DEL SERVIDOR linea 110 y 111
+10- Terminada la instalacion ingresamos al script de nuevo y modificamos el nombre del certificado y la clave en la configuracion del servidor
 
 cert servidor-vpn.crt <--- si pusimos otro nombre en el punto 5 modificar manteriendo su extension
 key servidor-vpn.key  <--- si pusimos otro nombre en el punto 5 modificar manteriendo su extension
 
 salimos y guardamos los cambios.
+
+# CREACION DE ARCHIVOS OVPN PARA LOS CLIENTES 
 
 11 - Dar permisos de ejecución
 
@@ -93,7 +95,7 @@ Common Name (eg: your user, host, or server name) [cliente]: "Presionar Enter"
 
 Confirm request details: yes
 
-17- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 4
+17- Nos pedira la contraseña para el certificado (CA) que definimos en el punto 5
 
 Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key: your_password
 
