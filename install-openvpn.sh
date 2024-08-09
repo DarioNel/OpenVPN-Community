@@ -93,7 +93,7 @@ serverconf='
 ;local a.b.c.d
 
 # Puerto
-port 1194
+port 57577
 
 # Protocolo 
 ;proto tcp
@@ -244,7 +244,7 @@ proto udp
 
 # Ip del servidor y el puerto
 
-remote 149.50.142.193 1194
+remote 181.92.8.99 57577
 ;remote my-server-2 1194
 
 # Conexion aleatoria a los servidores indicados
@@ -350,10 +350,7 @@ cd /etc/openvpn/client/
 
 chmod 700 make_config.sh
 
-# CONFIGURACION DE FIREALL E IPTABLES
-apt install ufw -y
-ufw enable
-ufw allow 1194/udp
+# CONFIGURACION DE FIREWALL E IPTABLES
 
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
@@ -361,14 +358,21 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 apt install iptables -y
 
-iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o eth0 -j MASQUERADE
-iptables -I INPUT 1 -i tun0 -j ACCEPT
-iptables -I FORWARD 1 -i eth0 -o tun0 -j ACCEPT
-iptables -I FORWARD 1 -i tun0 -o eth0 -j ACCEPT
-iptables -I INPUT 1 -i eth0 -p udp --dport 1194 -j ACCEPT
+# Abrimos los puertos en el sistema operativo del servidor
 
-iptables -L -nv
-iptables -t nat -L -nv
+iptables -A INPUT -p udp --dport 57577 -j ACCEPT
+iptables -A OUTPUT -p udp --sport 57577 -j ACCEPT
+
+# Aplicamos las reglas para la VPN en el firewall Iptables
+
+iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o enp2s0f5 -j MASQUERADE
+iptables -I INPUT 1 -i tun0 -j ACCEPT
+iptables -I FORWARD 1 -i enp2s0f5 -o tun0 -j ACCEPT
+iptables -I FORWARD 1 -i tun0 -o enp2s0f5 -j ACCEPT
+iptables -I INPUT 1 -i enp2s0f5 -p udp --dport 57577 -j ACCEPT
+
+#iptables -L -nv
+#iptables -t nat -L -nv
 apt install iptables-persistent -y
 netfilter-persistent save
 systemctl -f enable openvpn-server@server
