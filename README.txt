@@ -23,7 +23,7 @@ remote 123.456.789.10 1194 <---- Ponemos la ip Publica del servidor y el puerto
 
 # CONFIGURACION DE FIREWALL E IPTABLES
 
-Aca cambiamos el nombre del adaptador de red "eth0" por el nuestro
+Aca cambiamos el nombre del adaptador de red "enp2s0f5" por el nuestro
 
 salimos y guardamos los cambios.
 
@@ -76,7 +76,7 @@ salimos y guardamos los cambios.
 
 11 - Dar permisos de ejecución
 
-sudo chmod +x cliente-openvpn.sh
+chmod +x cliente-openvpn.sh
 
 12- Ejecutar el script cliente-openvpn.sh
 
@@ -112,8 +112,8 @@ cliente.ovpn <-- Este archivo nos servira para conectarnos al servidor VPN
 
 20- Si estamos en linux  ejecutamos los siguientes comandos
 
-sudo apt install openvpn
-sudo apt install openvpn-systemd-resolved
+apt install openvpn
+apt install openvpn-systemd-resolved
 
 Añadimos las siguientes lineas a este fichero al final del archivo 
 
