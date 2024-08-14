@@ -42,4 +42,4 @@ read namecliente
 
 /etc/openvpn/client/make_config.sh $namecliente
 
-echo "Vaya al directorio /home/OpenVPN-Clientes"
+echo "Vaya al escritorio en /home/$USER/Desktop/OpenVPN-Clientes"

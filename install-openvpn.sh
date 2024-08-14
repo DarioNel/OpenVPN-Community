@@ -312,7 +312,7 @@ echo "$clientconf" > /etc/openvpn/client/client.conf
 
 cp /etc/openvpn/client/client.conf /etc/openvpn/client/plantilla.conf
 
-mkdir -p /home/OpenVPN-Clientes
+mkdir -p /home/$USER/Desktop/OpenVPN-Clientes
 
 # SCRIPT MAKE_CONFIG PARA CREAR ARCHIVOS OVPN PARA LOS CLIENTES
 
@@ -328,7 +328,7 @@ makeconf='
 
 # Frist argument: Client identifier
 KEY_DIR=/etc/openvpn/client/keys
-OUTPUT_DIR=/home/OpenVPN-Clientes
+OUTPUT_DIR=/home/$USER/Desktop/OpenVPN-Clientes
 BASE_CONFIG=/etc/openvpn/client/plantilla.conf
 
 cat ${BASE_CONFIG} \
@@ -370,6 +370,10 @@ iptables -I INPUT 1 -i tun0 -j ACCEPT
 iptables -I FORWARD 1 -i enp2s0f5 -o tun0 -j ACCEPT
 iptables -I FORWARD 1 -i tun0 -o enp2s0f5 -j ACCEPT
 iptables -I INPUT 1 -i enp2s0f5 -p udp --dport 1194 -j ACCEPT
+
+# Habilitar ICMP
+iptables -A OUTPUT -o tun0 -p icmp -j ACCEPT 
+iptables -A INPUT -i tun0 -p icmp -j ACCEPT 
 
 #iptables -L -nv
 #iptables -t nat -L -nv
@@ -420,4 +424,4 @@ service openvpn-server@server restart
 
 #/etc/openvpn/client/make_config.sh $namecliente
 
-#echo "Vaya al directorio /home/OpenVPN-Clientes"
+#echo "Vaya al escritorio en  /home/$USER/Desktop/OpenVPN-Clientes"
