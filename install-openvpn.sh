@@ -312,7 +312,7 @@ echo "$clientconf" > /etc/openvpn/client/client.conf
 
 cp /etc/openvpn/client/client.conf /etc/openvpn/client/plantilla.conf
 
-mkdir -p /home/$USER/Desktop/OpenVPN-Clientes
+mkdir -p /home/$USER/OpenVPN-Clientes
 
 # SCRIPT MAKE_CONFIG PARA CREAR ARCHIVOS OVPN PARA LOS CLIENTES
 
@@ -328,7 +328,7 @@ makeconf='
 
 # Frist argument: Client identifier
 KEY_DIR=/etc/openvpn/client/keys
-OUTPUT_DIR=/home/$USER/Desktop/OpenVPN-Clientes
+OUTPUT_DIR=/home/$USER/OpenVPN-Clientes
 BASE_CONFIG=/etc/openvpn/client/plantilla.conf
 
 cat ${BASE_CONFIG} \
@@ -424,4 +424,4 @@ service openvpn-server@server restart
 
 #/etc/openvpn/client/make_config.sh $namecliente
 
-#echo "Vaya al escritorio en  /home/$USER/Desktop/OpenVPN-Clientes"
+#echo "Vaya a el directorio de su Usuario /home/$USER/OpenVPN-Clientes"

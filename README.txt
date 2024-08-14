@@ -106,7 +106,7 @@ Se han copiados los certificados y claves
 Ingrese el mismo nombre que creo para cliente:
 cliente
 
-19- Vaya al escritorio /home/$USER/Desktop/OpenVPN-Clientes
+19- Vaya a el directorio de su Usuario /home/$USER/OpenVPN-Clientes
 
 cliente.ovpn <-- Este archivo nos servira para conectarnos al servidor VPN
 
