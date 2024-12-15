@@ -1,4 +1,123 @@
 #!/bin/bash
+echo ""
+echo "BIENVENIDO VAMOS A INSTALAR OPENVPN"
+echo ""
+echo "A CONTINUACIÓN VAMOS A CONFIGURAR OPENVPN PARA LA INSTALACIÓN"
+echo ""
+
+ip link show
+
+echo ""
+while true ; do
+    echo ""
+    read -p "Ingrese el nombre de su adaptador de red: " a1
+    read -p "Repita  el nombre de su adaptador de red: " a2
+
+    if [ "$a1" == "$a2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t1
+        if [ $t1 == "y" ]; then
+            adaptador="$a1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir el nombre para su adaptador de red"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done
+echo ""
+while true ; do
+    echo ""
+    read -p "Ingrese un nombre para el servidor: " s1
+    read -p "Repita  el nombre para el servidor: " s2
+
+    if [ "$s1" == "$s2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t2
+        if [ $t2 == "y" ]; then
+            servidor="$s1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir el nombre para el servidor"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done
+echo ""
+while true ; do
+    echo ""
+    read -p "Ingrese su ip pública: " ip1
+    read -p "Repita  su ip pública: " ip2
+
+    if [ "$ip1" == "$ip2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t3
+        if [ $t3 == "y" ]; then
+            ipPublica="$ip1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir la ip publica"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done 
+echo ""
+while true ; do
+    echo ""
+    read -p "Ingrese el puerto: " p1
+    read -p "Repita  el puerto: " p2
+
+    if [ "$p1" == "$p2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t4
+        if [ $t4 == "y" ]; then
+            puert="$p1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir el puerto"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done 
+echo ""
+while true ; do
+    echo ""
+    read -p "Ingrese su usuario: " u1
+    read -p "Repita  su usuario: " u2
+
+    if [ "$u1" == "$u2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t5
+        if [ $t5 == "y" ]; then
+            usuario="$u1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir el usuario"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done       
+echo ""
 
 # ACTUALIZACIÓN DEL SISTEMA
 
@@ -44,9 +163,6 @@ cd /etc/openvpn/easy-rsa
 # Generaremos una clave privada para el servidor (.key)
 # y un archivo de solicitud de firma de certificado (CSR).req 
 
-echo "Ingrese un nombre para el servidor:"
-read servidor
-
 ./easyrsa gen-req $servidor nopass
 
 #req: /etc/openvpn/easy-rsa/pki/reqs/
@@ -76,7 +192,7 @@ openvpn --genkey secret ta.key
 
 #ls ca.crt  .crt  .key  ta.key
 
-# C
+# Creamos un directorio donde almacenamos las claves
 
 mkdir /etc/openvpn/client/keys
 
@@ -93,7 +209,7 @@ serverconf='
 ;local a.b.c.d
 
 # Puerto
-port 1194
+port '$puert'
 
 # Protocolo 
 ;proto tcp
@@ -107,8 +223,8 @@ dev tun
 # Modificar el nombre de las claves por el que hemos creado
 
 ca ca.crt
-cert servidor-vpn.crt
-key servidor-vpn.key  # This file should be kept secret
+cert '$servidor'.crt
+key '$servidor'.key  # This file should be kept secret
 
 # Desactivar la directiva Diffie hellman 
 
@@ -244,7 +360,7 @@ proto udp
 
 # Ip del servidor y el puerto
 
-remote [IP-Publica] 1194
+remote $ipPublica $puert
 ;remote my-server-2 1194
 
 # Conexion aleatoria a los servidores indicados
@@ -312,7 +428,7 @@ echo "$clientconf" > /etc/openvpn/client/client.conf
 
 cp /etc/openvpn/client/client.conf /etc/openvpn/client/plantilla.conf
 
-mkdir -p /home/$USER/OpenVPN-Clientes
+mkdir -p /home/$usuario/OpenVPN-Clientes
 
 # SCRIPT MAKE_CONFIG PARA CREAR ARCHIVOS OVPN PARA LOS CLIENTES
 
@@ -328,7 +444,7 @@ makeconf='
 
 # Frist argument: Client identifier
 KEY_DIR=/etc/openvpn/client/keys
-OUTPUT_DIR=/home/$USER/OpenVPN-Clientes
+OUTPUT_DIR=/home/'$usuario'/OpenVPN-Clientes
 BASE_CONFIG=/etc/openvpn/client/plantilla.conf
 
 cat ${BASE_CONFIG} \
@@ -360,68 +476,27 @@ apt install iptables -y
 
 # Abrimos los puertos en el sistema operativo del servidor
 
-iptables -A INPUT -p udp --dport 1194 -j ACCEPT
-iptables -A OUTPUT -p udp --sport 1194 -j ACCEPT
+iptables -A INPUT -p udp --dport $puert -j ACCEPT
+iptables -A OUTPUT -p udp --sport $puert -j ACCEPT
 
 # Aplicamos las reglas para la VPN en el firewall Iptables
 
-iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o enp2s0f5 -j MASQUERADE
+iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o $adaptador -j MASQUERADE
 iptables -I INPUT 1 -i tun0 -j ACCEPT
-iptables -I FORWARD 1 -i enp2s0f5 -o tun0 -j ACCEPT
-iptables -I FORWARD 1 -i tun0 -o enp2s0f5 -j ACCEPT
-iptables -I INPUT 1 -i enp2s0f5 -p udp --dport 1194 -j ACCEPT
+iptables -I FORWARD 1 -i $adaptador -o tun0 -j ACCEPT
+iptables -I FORWARD 1 -i tun0 -o $adaptador -j ACCEPT
+iptables -I INPUT 1 -i $adaptador -p udp --dport $puert -j ACCEPT
 
 # Habilitar ICMP
 iptables -A OUTPUT -o tun0 -p icmp -j ACCEPT 
 iptables -A INPUT -i tun0 -p icmp -j ACCEPT 
 
-#iptables -L -nv
-#iptables -t nat -L -nv
+
+# Guardamos los cambios de iptables
 apt install iptables-persistent -y
 netfilter-persistent save
+
+# Reiniciamos el servicio
+
 systemctl -f enable openvpn-server@server
 service openvpn-server@server restart
-
-#!/bin/bash
-
-#echo "vamos a crear los certificados y claves para un cliente"
-
-# CREACION DE CERTIFICADOS Y CLAVES PARA EL CLIENTE
-
-# Generaremos una clave privada para el cliente (.key)
-# y un archivo de solicitud de firma de certificado (CSR).req 
-
-#echo "Ingrese un nombre para el cliente:"
-#read cliente
-
-#./easyrsa gen-req $cliente nopass
-
-#req: /etc/openvpn/easy-rsa/pki/reqs/
-#key: /etc/openvpn/easy-rsa/pki/private/
-
-#"Presione Enter"
-
-# Firmar el certificado del cliente con la (CA) en modo «client»:
-
-#./easyrsa sign-req client $cliente
-
-#"Escriba yes para confirmar"
-# Ingresese la contraseña del certificado (CA) para firmalo
-
-# Copiando los cerfificados y claves firmados del cliente.
-
-#cp /etc/openvpn/easy-rsa/pki/ca.crt  /etc/openvpn/client/keys
-#cp /etc/openvpn/easy-rsa/pki/issued/$cliente.crt /etc/openvpn/client/keys
-#cp /etc/openvpn/easy-rsa/pki/private/$cliente.key /etc/openvpn/client/keys
-#cp /etc/openvpn/server/ta.key /etc/openvpn/client/keys
-
-#echo "Se han copiados los certificados y claves"
-
-# Creando archivo de configuración para cliente
-
-#echo "Ingrese el mismo nombre que creo para cliente:"
-#read namecliente
-
-#/etc/openvpn/client/make_config.sh $namecliente
-
-#echo "Vaya a el directorio de su Usuario /home/$USER/OpenVPN-Clientes"

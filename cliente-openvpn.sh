@@ -1,6 +1,32 @@
 #!/bin/bash
+echo ""
+echo "BIENVENIDO VAMOS A CREAR EL ARCHIVO DE CONFIGURACION PARA EL CLIENTE OPENVPN"
+echo ""
+echo "A CONTINUACIÓN VAMOS A CREAR CERTIFICADOS Y CLAVES PARA EL CLIENTE"
+echo ""
 
-echo "vamos a crear los certificados y claves para un cliente"
+while true ; do
+    echo ""
+    read -p "Ingrese un nombre para el cliente: " c1
+    read -p "Repita  el nombre para el cliente: " c2
+
+    if [ "$c1" == "$c2" ]; then
+        echo ""
+        echo "¿Esta seguro que ha ingresado correnctamente?"
+        read -p "Presione -y- para confirmar o cualquier tecla para volver a introducir: " t
+        if [ $t == "y" ]; then
+            cliente="$c1"
+            break
+        else
+            echo ""
+            echo "Volviendo a introducir el nombre para el cliente"
+        fi
+    else
+        echo ""
+        echo "Los datos no coinciden, vuelva a intentarlo"
+    fi
+done
+echo ""
 
 # CREACION DE CERTIFICADOS Y CLAVES PARA EL CLIENTE
 
@@ -8,9 +34,6 @@ echo "vamos a crear los certificados y claves para un cliente"
 # y un archivo de solicitud de firma de certificado (CSR).req 
 
 cd /etc/openvpn/easy-rsa
-
-echo "Ingrese un nombre para el cliente:"
-read cliente
 
 ./easyrsa gen-req $cliente nopass
 
@@ -37,9 +60,7 @@ echo "Se han copiados los certificados y claves"
 
 # Creando archivo de configuración para cliente
 
-echo "Ingrese el mismo nombre que creo para cliente:"
-read namecliente
+/etc/openvpn/client/make_config.sh $cliente
 
-/etc/openvpn/client/make_config.sh $namecliente
-
-echo  "Vaya a el directorio de su Usuario /home/$USER/OpenVPN-Clientes"
+echo "LOS ARCHIVOS DE CONFIGURACIÓN DEL CLIENTE SE ENCUENTRA EN LA CARPETA DE SU USUARIO"
+echo "Path /home/tu_usuario/"
